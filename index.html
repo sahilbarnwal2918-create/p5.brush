@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#e8ebf2">
+  <meta name="color-scheme" content="light">
+  <title>Brush Studio · p5.brush</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>Brush Studio</h1>
+    <div class="actions">
+      <button type="button" id="undoBtn" class="btn" disabled>Undo</button>
+      <button type="button" id="clearBtn" class="btn">Clear</button>
+      <button type="button" id="saveBtn" class="btn btn-primary">Save PNG</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" role="alert" hidden></div>
+
+  <div id="stageWrap">
+    <!-- p5 puts its WEBGL canvas here (moved in sketch.js). #preview is a thin
+         2D guide line shown while your finger is down. -->
+    <div id="stage">
+      <canvas id="preview" width="720" height="960"></canvas>
+    </div>
+  </div>
+
+  <section class="tray" aria-label="Drawing controls">
+
+    <div class="tools" role="group" aria-label="Tool">
+      <button type="button" class="tool" data-tool="draw" aria-pressed="true">Brush</button>
+      <button type="button" class="tool" data-tool="water" aria-pressed="false">Watercolor</button>
+      <button type="button" class="tool" data-tool="hatch" aria-pressed="false">Hatch</button>
+    </div>
+
+    <p id="hint" class="hint"></p>
+
+    <!-- Brush picker (Brush tool) -->
+    <div class="group" data-tools="draw">
+      <div id="brushChips" class="chips" role="group" aria-label="Brush"></div>
+    </div>
+
+    <!-- Hatch pen picker (Hatch tool) -->
+    <div class="group" data-tools="hatch">
+      <div id="hatchChips" class="chips" role="group" aria-label="Hatch pen"></div>
+    </div>
+
+    <!-- Colour -->
+    <div class="group colors">
+      <input type="color" id="colorPicker" value="#2f2a26" aria-label="Colour">
+      <div id="swatches" class="swatches" role="group" aria-label="Palette"></div>
+    </div>
+
+    <!-- Sliders -->
+    <div class="sliders">
+      <label class="slider" data-tools="draw hatch">
+        <span>Size</span><output></output>
+        <input type="range" data-key="size" min="0.3" max="5" step="0.1" value="1">
+      </label>
+
+      <label class="slider" data-tools="water">
+        <span>Opacity</span><output></output>
+        <input type="range" data-key="opacity" min="20" max="255" step="5" value="110">
+      </label>
+      <label class="slider" data-tools="water">
+        <span>Bleed</span><output></output>
+        <input type="range" data-key="bleed" min="0" max="1" step="0.05" value="0.3">
+      </label>
+      <label class="slider" data-tools="water">
+        <span>Texture</span><output></output>
+        <input type="range" data-key="texture" min="0" max="1" step="0.05" value="0.6">
+      </label>
+
+      <label class="slider" data-tools="hatch">
+        <span>Spacing</span><output></output>
+        <input type="range" data-key="spacing" min="4" max="40" step="1" value="10">
+      </label>
+      <label class="slider" data-tools="hatch">
+        <span>Angle</span><output></output>
+        <input type="range" data-key="angle" min="0" max="180" step="5" value="45">
+      </label>
+      <label class="slider" data-tools="hatch">
+        <span>Roughness</span><output></output>
+        <input type="range" data-key="rough" min="0" max="0.5" step="0.05" value="0">
+      </label>
+    </div>
+
+    <div class="checks">
+      <label class="check" data-tools="water">
+        <input type="checkbox" data-key="flat"> Flat wash (no watercolor texture)
+      </label>
+      <label class="check" data-tools="hatch">
+        <input type="checkbox" data-key="cross"> Cross-hatch
+      </label>
+      <label class="check" data-tools="hatch">
+        <input type="checkbox" data-key="outline" checked> Outline
+      </label>
+    </div>
+
+  </section>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <noscript><p class="banner">This app needs JavaScript enabled.</p></noscript>
+
+  <!-- Order matters: p5 first, then p5.brush, then the sketch. -->
+  <!-- p5.js 2.x (p5.brush's p5 build requires 2.x). -->
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
+  <!-- p5.brush (p5 build) from your fork's dist/ folder, matching the README you forked. -->
+  <script src="https://cdn.jsdelivr.net/gh/sahilbarnwal2918-create/p5.brush@main/dist/p5.brush.js"></script>
+  <script src="sketch.js"></script>
+</body>
+</html>
