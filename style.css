@@ -304,3 +304,15 @@ button:focus-visible, input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .toast { transition: none; }
   }
+.creator-credit {
+  padding: 12px 10px;
+  text-align: center;
+  color: #59627a;
+  font-size: 13px;
+  border-top: 1px solid #e8ebf2;
+}
+
+.creator-credit strong {
+  color: #2f45d0;
+  font-weight: 700;
+}
