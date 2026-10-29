@@ -9,7 +9,132 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+ <!-- ===== BS-INTRO HTML START ===== -->  <!-- Starts hidden. The script below reveals it, so if JavaScript fails the  
+     overlay simply never appears and your app is untouched. -->  <div class="bs-intro" id="bs-intro" hidden aria-hidden="true">  
+  <div class="bs-intro__stage">  
+    <svg class="bs-intro__ribbon" viewBox="0 0 400 160" focusable="false">  
+      <defs>  
+        <linearGradient id="bs-intro-grad" x1="0" y1="0" x2="1" y2="0">  
+          <stop offset="0"   stop-color="#2f45d0"/>  
+          <stop offset=".25" stop-color="#6a4c93"/>  
+          <stop offset=".5"  stop-color="#c97b84"/>  
+          <stop offset=".75" stop-color="#f46036"/>  
+          <stop offset="1"   stop-color="#f2b134"/>  
+        </linearGradient>  
+      </defs>  <!-- Five pigments laid down side by side, like a loaded flat brush -->  
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">  
+    <path class="bs-intro__strand" pathLength="1" stroke-dashoffset="1.02" stroke="#2f45d0" stroke-width="9"  
+          d="M-20 79 C40 14 92 6 140 54 S230 124 290 64 S370 4 420 44"/>  
+    <path class="bs-intro__strand" pathLength="1" stroke-dashoffset="1.02" stroke="#6a4c93" stroke-width="10"  
+          d="M-22 88 C40 22 90 14 142 62 S230 132 288 72 S372 12 420 54"/>  
+    <path class="bs-intro__strand" pathLength="1" stroke-dashoffset="1.02" stroke="#c97b84" stroke-width="10.5"  
+          d="M-20 95 C40 30 90 20 140 70 S230 140 290 80 S370 20 420 60"/>  
+    <path class="bs-intro__strand" pathLength="1" stroke-dashoffset="1.02" stroke="#f46036" stroke-width="9.5"  
+          d="M-24 104 C38 38 88 29 138 80 S232 148 292 88 S368 29 420 69"/>  
+    <path class="bs-intro__strand" pathLength="1" stroke-dashoffset="1.02" stroke="#f2b134" stroke-width="8.5"  
+          d="M-20 111 C42 46 92 36 140 86 S228 156 290 96 S372 36 420 77"/>  
+  </g>  
 
+  <!-- The paintbrush. Its tip sits at (0,0); the script moves it along the stroke. -->  
+  <g class="bs-intro__brush">  
+    <g class="bs-intro__brush-pos" transform="translate(-20 95) rotate(26) scale(1.05)">  
+      <path d="M-5.5 -18 C-6.5 -9 -3.5 -2.5 0 0 C3.5 -2.5 6.5 -9 5.5 -18 Z" fill="url(#bs-intro-grad)"/>  
+      <rect x="-6" y="-30" width="12" height="12" rx="1.5" fill="#c4c9d6"/>  
+      <path d="M-6 -24 H6" stroke="#9aa1b3" stroke-width=".8"/>  
+      <path d="M-4.6 -30 L-3 -84 Q0 -89 3 -84 L4.6 -30 Z" fill="#2b3350"/>  
+    </g>  
+  </g>  
+</svg>
+
+  </div>    <div class="bs-intro__title">Brush Studio</div>    <svg class="bs-intro__rule" viewBox="0 0 200 14" focusable="false">  
+    <path pathLength="1" stroke-dashoffset="1.02" fill="none" stroke="#f46036" stroke-width="2.6" stroke-linecap="round"  
+          d="M4 8 C30 2 52 13 82 7 S132 3 160 9 S186 9 196 5"/>  
+  </svg>    <div class="bs-intro__credit">Created by Sahil Barnwal</div>  
+</div>  <script>  
+/* Brush Studio intro — runs once per page load.  
+   The CSS above drives the fades, title, underline and credit.  
+   This script only (1) starts the clock, (2) draws the brushstroke and moves  
+   the brush along it, and (3) removes the overlay from the page at the end. */  
+function bsIntroStart(el) {  
+  if (!el) return;  
+  
+  var done = false, leaving = false, raf = 0, timer = 0;  
+  
+  function finish() {  
+    if (done) return;  
+    done = true;  
+    cancelAnimationFrame(raf);  
+    clearTimeout(timer);  
+    if (el.parentNode) el.parentNode.removeChild(el);   // gone from the page and the accessibility tree  
+  }  
+  
+  // Tap anywhere to skip: quick fade, then remove.  
+  function skip() {  
+    if (done || leaving) return;  
+    leaving = true;  
+    var o = window.getComputedStyle(el).opacity;  
+    el.style.animation = 'none';  
+    el.style.opacity = o;  
+    void el.offsetWidth;  
+    el.style.transition = 'opacity .25s ease';  
+    el.style.opacity = '0';  
+    timer = setTimeout(finish, 280);  
+  }  
+  
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;  
+  // Skip entirely for reduced motion, or if the intro CSS didn't load (e.g. a stale cached style.css).  
+  if (reduce || window.getComputedStyle(el).position !== 'fixed') { finish(); return; }  
+  
+  var strands = Array.prototype.slice.call(el.querySelectorAll('.bs-intro__strand'));  
+  var brush = el.querySelector('.bs-intro__brush-pos');  
+  var guide = strands[2] || strands[0];      // the brush follows the middle strand  
+  var len = 0;  
+  
+  el.hidden = false;                         // reveal the overlay  
+  el.classList.add('is-playing');            // start every CSS animation  
+  var t0 = performance.now();                // …and our own clock, in the same moment  
+  try { len = guide.getTotalLength(); } catch (e) { len = 0; }  
+  
+  el.addEventListener('pointerdown', skip);  
+  el.addEventListener('animationend', function (e) {  
+    if (e.target === el && e.animationName === 'bs-intro-fade') finish();  
+  });  
+  timer = setTimeout(finish, 4100);          // safety net  
+  
+  // Brushstroke: 0.5s → 1.5s, each pigment starting a hair after the last.  
+  function ease(u) { return u < .5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u); }  
+  
+  function tick(now) {  
+    var t = (now - t0) / 1000, lead = 0;  
+  
+    for (var i = 0; i < strands.length; i++) {  
+      var start = .5 + i * .03;  
+      var u = (t - start) / (1.5 - start);  
+      u = u < 0 ? 0 : (u > 1 ? 1 : u);  
+      var p = ease(u);  
+      strands[i].setAttribute('stroke-dashoffset', (1.02 * (1 - p)).toFixed(4));  
+      if (strands[i] === guide) lead = p;  
+    }  
+  
+    if (brush && len) {  
+      var d = len * lead;  
+      var a = guide.getPointAtLength(Math.max(0, d - 2));  
+      var b = guide.getPointAtLength(Math.min(len, d + 2));  
+      var c = guide.getPointAtLength(d);  
+      var dir = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;  
+      var tremor = Math.sin(t * 11) * 1.6;   // a touch of hand wobble  
+      brush.setAttribute('transform',  
+        'translate(' + c.x.toFixed(2) + ' ' + c.y.toFixed(2) + ') ' +  
+        'rotate(' + (26 + dir * .3 + tremor).toFixed(2) + ') scale(1.05)');  
+    }  
+  
+    if (t < 1.6) raf = requestAnimationFrame(tick);  
+  }  
+  raf = requestAnimationFrame(tick);  
+}  
+  
+bsIntroStart(document.getElementById('bs-intro'));  
+</script>  <!-- ===== BS-INTRO HTML END ===== -->
   <header class="topbar">
     <h1>Brush Studio</h1>
     <div class="actions">
